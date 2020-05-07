@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detector de Copia</title>
+	<link href="../css/jquery-ui.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../css/estilo.css">
+    <link rel="stylesheet" type="text/css" href="../css/material-darker.css">
+    <link rel="stylesheet" href="../js/lib/codemirror.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.0.9/jstree.min.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/lib/codemirror.js"></script>
+    <script src="../js/mode/javascript/javascript.js"></script>
+    <script src="../js/jquery.js"></script>
+    <script src="../js/jquery-ui.js"></script>
+  
+</head>
+<body>
+    <div class="principal">
+        <header>
+            <label class="boton" for="abrir">Abrir archivo</label>
+            <input type="file" id="abrir" onchange="abrirArchivo()" class="file" />
+            <a href="" class="boton" >Guardar</a>
+            <div>
+                <a href="#" class="boton" onclick="analizar()">Analizar</a>
+                <a href="#" class="boton" onclick="ver()" >Reportar Copia</a>
+                <a  href="#" class="boton">Generar AST</a>
+            </div>
+        </header>
+        <form action="">
+            <div class="writer" >
+                <textarea name="traducido" class ="area" id="entrada" ></textarea>
+                <script>
+                    const editor = CodeMirror.fromTextArea(entrada, {
+                        lineNumbers: true,
+                        mode: "javascript",
+                        theme: "material-darker"
+                    });
+                    editor.setSize(695, 350)
+                </script>
+            </div>
+            
+            <div id="tabs" class="writer">
+                <ul>
+                  <li><a href="#tabs-1">Archivo 1</a></li>
+                  <li><a href="#tabs-2">Archivo 2</a></li>
+                  <li><a href="#tabs-3">Archivo 3</a></li>
+                  <li><a href="#tabs-4">Archivo 4</a></li>
+                </ul>
+                <div id="tabs-1">
+                    <textarea name="traducido" class ="area" id="copia1" cols="80" ></textarea>
+                    <script>
+                        const editorcopia1 = CodeMirror.fromTextArea(copia1, {
+                            lineNumbers: true,
+                            mode: "javascript",
+                            theme: "material-darker"
+                        });
+                    </script>
+                </div>
+                <div id="tabs-2">
+                    <textarea name="traducido" class ="area" id="copia2" cols="80" ></textarea>
+                    <script>
+                        const editorcopia2 = CodeMirror.fromTextArea(copia2, {
+                            lineNumbers: true,
+                            mode: "javascript",
+                            theme: "material-darker"
+                        });
+                    </script>
+                </div>
+                <div id="tabs-3">
+                    <textarea name="traducido" class ="area" id="copia3" cols="80" ></textarea>
+                    <script>
+                        const editorcopia3 = CodeMirror.fromTextArea(copia3, {
+                            lineNumbers: true,
+                            mode: "javascript",
+                            theme: "material-darker"
+                        });
+                    </script>
+                </div>
+                <div id="tabs-4">
+                    <textarea name="traducido" class ="area" id="copia4" cols="80" ></textarea>
+                    <script>
+                        const editorcopia4 = CodeMirror.fromTextArea(copia4, {
+                            lineNumbers: true,
+                            mode: "javascript",
+                            theme: "material-darker"
+                        });
+                    </script>
+                </div>
+              </div>
+            <div class="writer">
+                <textarea name="traducido" class ="area" id="copia" ></textarea>
+                <script>
+                    const editorcopia = CodeMirror.fromTextArea(copia, {
+                        lineNumbers: true,
+                        mode: "javascript",
+                        theme: "material-darker"
+                    });
+                </script>
+            </div>
+            <div >
+                <iframe class="writer" src="./js/ReporteAST.html" frameborder="0"></iframe>
+            </div>
+        </form>
+    </div>
+    <script>
+        $( "#tabs" ).tabs();
+    </script>
+</body>
+</html>

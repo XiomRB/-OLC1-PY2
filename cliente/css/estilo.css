@@ -1,0 +1,56 @@
+body{
+    background-color: rgb(58, 9, 104);
+}
+#principal{
+    width:  95%;
+    height: 95%;
+    margin: auto;
+}
+header{
+    width:  95%;
+    height: 7%;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+.area{
+    margin-left: 2.5%;
+}
+a{
+    text-align: center;
+    text-decoration: none;
+}
+.writer{
+    width:705px;
+    height: 360px;
+    float: left;
+}
+#var{
+    overflow: scroll;
+    width:705px;
+    height: 360px;
+    float: left;
+}
+.cabecera{
+    display: inline-block;
+    text-decoration: none;
+    padding: 10px;
+}
+.pestaña{
+    position: absolute;
+    height: 90%;
+    margin:auto;
+}
+.boton{
+    display: inline-block;
+    background-color: rgb(15, 81, 143);
+    color:white;
+    border:1px solid  rgb(5, 33, 110);
+    width: 15%;
+    padding: 1%;
+    margin-bottom: 5px;
+    margin-right: 2%;
+    margin-left: 2%;
+}
+.file{
+    visibility: hidden;
+}
