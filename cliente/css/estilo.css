@@ -1,6 +1,11 @@
 body{
     background-color: rgb(58, 9, 104);
 }
+.divtabla{
+    width:  650px;
+    height:  315px;;
+    overflow: scroll;
+}
 #principal{
     width:  95%;
     height: 95%;
@@ -12,6 +17,16 @@ header{
     margin-bottom: 5px;
     padding: 5px;
 }
+.ta{
+    margin: auto;
+    width: 90%;
+    border-top: 1px solid;
+    border-left: 1px solid;
+}
+td,th{
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+}
 .area{
     margin-left: 2.5%;
 }
@@ -20,7 +35,7 @@ a{
     text-decoration: none;
 }
 .writer{
-    width:705px;
+    width:680px;
     height: 360px;
     float: left;
 }

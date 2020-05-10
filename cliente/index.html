@@ -12,6 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.0.9/jstree.min.js"></script>
     <script src="../js/index.js"></script>
+    <script src="../js/analizador.js"></script>
     <script src="../js/lib/codemirror.js"></script>
     <script src="../js/mode/javascript/javascript.js"></script>
     <script src="../js/jquery.js"></script>
@@ -23,11 +24,11 @@
         <header>
             <label class="boton" for="abrir">Abrir archivo</label>
             <input type="file" id="abrir" onchange="abrirArchivo()" class="file" />
-            <a href="" class="boton" >Guardar</a>
+            <a href="" class="boton"  >Guardar</a>
             <div>
                 <a href="#" class="boton" onclick="analizar()">Analizar</a>
-                <a href="#" class="boton" onclick="ver()" >Reportar Copia</a>
-                <a  href="#" class="boton">Generar AST</a>
+                <a href="#" class="boton" onclick="analizarArchs()">Reportar Copia</a>
+                <a  href="#" class="boton" onclick="analizarArchivos()">Analizar Archivos</a>
             </div>
         </header>
         <form action="">
@@ -48,10 +49,9 @@
                   <li><a href="#tabs-1">Archivo 1</a></li>
                   <li><a href="#tabs-2">Archivo 2</a></li>
                   <li><a href="#tabs-3">Archivo 3</a></li>
-                  <li><a href="#tabs-4">Archivo 4</a></li>
                 </ul>
                 <div id="tabs-1">
-                    <textarea name="traducido" class ="area" id="copia1" cols="80" ></textarea>
+                    <textarea name="traducido" class ="area" id="copia1" ></textarea>
                     <script>
                         const editorcopia1 = CodeMirror.fromTextArea(copia1, {
                             lineNumbers: true,
@@ -61,7 +61,7 @@
                     </script>
                 </div>
                 <div id="tabs-2">
-                    <textarea name="traducido" class ="area" id="copia2" cols="80" ></textarea>
+                    <textarea name="traducido" class ="area" id="copia2" ></textarea>
                     <script>
                         const editorcopia2 = CodeMirror.fromTextArea(copia2, {
                             lineNumbers: true,
@@ -71,7 +71,7 @@
                     </script>
                 </div>
                 <div id="tabs-3">
-                    <textarea name="traducido" class ="area" id="copia3" cols="80" ></textarea>
+                    <textarea name="traducido" class ="area" id="copia3" ></textarea>
                     <script>
                         const editorcopia3 = CodeMirror.fromTextArea(copia3, {
                             lineNumbers: true,
@@ -80,26 +80,31 @@
                         });
                     </script>
                 </div>
-                <div id="tabs-4">
-                    <textarea name="traducido" class ="area" id="copia4" cols="80" ></textarea>
-                    <script>
-                        const editorcopia4 = CodeMirror.fromTextArea(copia4, {
-                            lineNumbers: true,
-                            mode: "javascript",
-                            theme: "material-darker"
-                        });
-                    </script>
-                </div>
               </div>
-            <div class="writer">
-                <textarea name="traducido" class ="area" id="copia" ></textarea>
-                <script>
-                    const editorcopia = CodeMirror.fromTextArea(copia, {
-                        lineNumbers: true,
-                        mode: "javascript",
-                        theme: "material-darker"
-                    });
-                </script>
+            <div id ="tbs" class="writer">
+                <ul>
+                    <li><a href="#tbs-1">Reporte Clase</a></li>
+                    <li><a href="#tbs-2" onclick="reporteFuncion()">Reporte Funciones</a></li>
+                    <li><a href="#tbs-3" onclick="reporteVariable()">Reporte Variables</a></li>
+                  </ul>
+                  <div id="tbs-1">
+                      <div class="divtabla">
+                        <table class="ta" id = "tablaClase">
+                        </table>
+                      </div>
+                  </div>
+                  <div id="tbs-2">
+                      <div class="divtabla">
+                        <table class="ta" id ="tablaFuncion">
+                        </table>
+                      </div>
+                  </div>
+                  <div id="tbs-3">
+                      <div class="divtabla">
+                        <table class="ta" id="tablaVariable">
+                        </table>
+                      </div>
+                  </div>
             </div>
             <div >
                 <iframe class="writer" src="./js/ReporteAST.html" frameborder="0"></iframe>
@@ -108,6 +113,7 @@
     </div>
     <script>
         $( "#tabs" ).tabs();
+        $( "#tbs" ).tabs();
     </script>
 </body>
 </html>

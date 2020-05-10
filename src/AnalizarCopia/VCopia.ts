@@ -42,28 +42,35 @@ export default class Variable{
         let copy:Nodo = this.verificarFuncion(copia,l)
         if (origen.valor == copy.valor) {
             this.nombre = origen.valor
-            for (let i = 0; i < this.variables.length; i++) {
-                let j
-                for (j = 0; j < l.length; j++) {
-                    if((this.variables[i].funcion == l[j].funcion) && (this.variables[i].tipo == l[j].tipo) ){
-                            let k
-                            for (k = 0; k < this.variables[i].nombre.length; k++) {
-                                let m;
-                                for (m = 0; m < l[j].nombre.length; m++) {
-                                    if(this.variables[i].nombre[k] == l[j].nombre[m])break
+            let i:number = 0
+            while(i < this.variables.length && i < l.length){
+                if(this.variables[i].funcion == l[i].funcion){
+                    if(this.variables[i].tipo == l[i].tipo){
+                        if (JSON.stringify(this.variables[i].nombre) == JSON.stringify(l[i].nombre)) i++
+                        else {
+                            let j = 0
+                            while(j < this.variables[i].nombre.length && j < l[i].nombre.length){
+                                if(this.variables[i].nombre[j] == l[i].nombre[j]) i++
+                                else{
+                                    this.variables.splice(i,1)
+                                    l.splice(i,1)
                                 }
-                                if(m == l[j].nombre.length) this.variables[i].nombre.splice(k,1)
-                                else break
                             }
-                            if(k != this.variables[i].nombre.length) break
-                        
+                            if(j < this.variables[i].nombre.length){
+                                this.variables.splice(j,this.variables.length-j-1) //borra las funciones que sobran en el original
+                            }
+                        }
+                    }else{
+                        this.variables.splice(i,1)
+                        l.splice(i,1)
                     }
-                }
-                console.log(j + " original " + i )
-                if(j == l.length){
+                }else{
                     this.variables.splice(i,1)
-                    i--
-                } 
+                    l.splice(i,1)
+                }
+            }
+            if(i < this.variables.length){
+                this.variables.splice(i,this.variables.length-i)
             }
         }
     }
@@ -71,7 +78,7 @@ export default class Variable{
 
 class Var{
     tipo:string
-    nombre:Array<string> //LISTA DE IDs
+    nombre:Array<string>
     funcion:string
 
     constructor(t:string,f:string){

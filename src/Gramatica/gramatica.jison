@@ -1,5 +1,5 @@
 %{
-    const Nodo = require('../Arbol/Nodo');
+    const Nodo = require('../Arbol/Nodos');
 %}
 
 /* Definición Léxica */
@@ -98,7 +98,7 @@
 %% /* Definición de la gramática */
 
 ini
-	: arch EOF {$$ = new Nodo("RAIZ",""); $$.setHijos($1); return $$;}
+	: arch EOF {$$ = new Nodo("RAIZ","RAIZ"); $$.setHijos($1); return $$;}
 ;
 
 clase : CLASS IDENTIFICADOR instclase {$$ = new Nodo("CLASE",$2); if($3!=null) $$.setHijos($3)} ;
@@ -110,7 +110,7 @@ listaid
 
 declavar : tipo listaid asigvar { $$ = new Nodo("DECLARACION",$1); $$.setHijos($2); if($3 != null) $$.sentencias.push($3); };
 
-asigvar : ASIGNADOR expresion PTCOMA {$$ = new Nodo("ASIGNACION",""); $$.sentencias.push($2);}
+asigvar : ASIGNADOR expresion PTCOMA {$$ = new Nodo("ASIGNACION","EXPRESION"); $$.sentencias.push($2);}
          | PTCOMA {$$ = null;}
 ;
 
@@ -160,11 +160,11 @@ param
   | PARDER {$$ = null;}
 ;
 
-condicion : PARIZQ expresion PARDER { $$ = new Nodo("CONDICION", ""); $$.sentencias.push($2) } ;
+condicion : PARIZQ expresion PARDER { $$ = new Nodo("CONDICION", "CONDICION"); $$.sentencias.push($2) } ;
 
 
-operador: INCREMENTO { $$ = new Nodo("SENTENCIAINCREMENTO",$1); }
-  | DECREMENTO { $$ = new Nodo("SENTENCIADECREMENTO",$1); }
+operador: INCREMENTO { $$ = new Nodo("SENTENCIA",$1); }
+  | DECREMENTO { $$ = new Nodo("SENTENCIA",$1); }
 ;
 
 repmet : LLAVEIZQ instruccionesrepmet LLAVEDER  { $$ = $2; }
@@ -177,16 +177,16 @@ ifmet : LLAVEIZQ instruccionesifmet LLAVEDER    { $$ = $2; }
 
 sentwhilemet : WHILE condicion repmet { $$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2)};
 
-sentformet : FOR PARIZQ inifor PTCOMA expresion PTCOMA IDENTIFICADOR operador PARDER repmet {$$ = new Nodo("SENTENCIAFOR",$1); if($10 != null) $$.setHijos($10); $$.sentencias.unshift($8); $$.sentencias.unshift(new Nodo("CONDICION","")) ; $$.sentencias[0].sentencias.push($5); $$.sentencias.unshift($3);};
+sentformet : FOR PARIZQ inifor PTCOMA expresion PTCOMA IDENTIFICADOR operador PARDER repmet {$$ = new Nodo("SENTENCIA",$1); if($10 != null) $$.setHijos($10); $$.sentencias.unshift($8); $$.sentencias.unshift(new Nodo("CONDICION","CONDICION")) ; $$.sentencias[0].sentencias.push($5); $$.sentencias.unshift($3);};
 
 sentifmet : IF condicion ifmet {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);}
-   | IF condicion ifmet ELSE ifmet {$$ = new Nodo("SENTENCIAIF",""); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);$$.sentencias.push(new Nodo("SENTENCIA",$4)); if($5 != null) $$.sentencias[$$.sentencias.length-1].setHijos($5);}
+   | IF condicion ifmet ELSE ifmet {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);$$.sentencias.push(new Nodo("SENTENCIA",$4)); if($5 != null) $$.sentencias[$$.sentencias.length-1].setHijos($5);}
    | IF condicion ifmet ELSE sentifmet {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3);$$.sentencias.unshift($2);$$.sentencias.push($5);}
 ;
 
 sentdowhilemet : DO repmet WHILE condicion PTCOMA { $$ = new Nodo("SENTENCIA",$1); if($2 != null) $$.setHijos($2);  $$.sentencias.push($4); };
 
-sentswitchmet : SWITCH PARIZQ expresion PARDER LLAVEIZQ casedef LLAVEDER {$$ = new Nodo("SENTENCIASWITCH",$1); $$.setHijos($6); $$.sentencias.unshift($3)};
+sentswitchmet : SWITCH PARIZQ expresion PARDER LLAVEIZQ casedef LLAVEDER {$$ = new Nodo("SENTENCIA",$1); $$.setHijos($6); $$.sentencias.unshift($3)};
 
 inifor: tipo IDENTIFICADOR ASIGNADOR expresion {$$ = new Nodo("DECLARACION",$1); $$.sentencias.push(new Nodo("VARIABLE",$2));$$.sentencias[0].sentencias.push($4);}
       | IDENTIFICADOR ASIGNADOR expresion {$$ = new Nodo("ASIGNACION",$1); $$.sentencias.push($3);}
@@ -200,15 +200,15 @@ casedef : listacase {$$ = $1;}
         | listacase DEFAULT DOSPUNTOS {$$ = $1; $$.push(new Nodo("DEFAULT",$2)) }
 ;
 
-sentbreak : BREAK PTCOMA {$$ = new Nodo("SENTENCIABREAK",$1);};
+sentbreak : BREAK PTCOMA {$$ = new Nodo("SENTENCIA",$1);};
 
-sentcont : CONTINUE PTCOMA {$$ = new Nodo("SENTENCIACONTINUE",$1);};
+sentcont : CONTINUE PTCOMA {$$ = new Nodo("SENTENCIA",$1);};
 
-sentretmet : RETURN PTCOMA {$$ = new Nodo("SENTENCIARETURN",$1)};
-sentretfun : RETURN expresion PTCOMA {$$ = new Nodo("SENTENCIARETURN",$1); $$.sentencias.push($2); };
+sentretmet : RETURN PTCOMA {$$ = new Nodo("RETURN",$1)};
+sentretfun : RETURN expresion PTCOMA {$$ = new Nodo("RETURN",$1); $$.sentencias.push($2); };
 
-sout : PRINT PARIZQ expresion PARDER PTCOMA     {$$ = new Nodo("SENTENCIAPRINT",$1); $$.sentencias.push($3)}
-     | PRINTLN PARIZQ expresion PARDER PTCOMA   {$$ = new Nodo("SENTENCIAPRINTLN",$1); $$.sentencias.push($3)}
+sout : PRINT PARIZQ expresion PARDER PTCOMA     {$$ = new Nodo("SENTENCIA",$1); $$.sentencias.push($3)}
+     | PRINTLN PARIZQ expresion PARDER PTCOMA   {$$ = new Nodo("SENTENCIA",$1); $$.sentencias.push($3)}
 ;
 
 instruccionesifmet
@@ -219,9 +219,9 @@ instruccionesifmet
 instruccionifmet
 	: sout  {$$ = $1;}
   | sentwhilemet {$$ = $1;}
-  | sentdowhilemet {$$ = $1;}
-  | sentformet { $$ = $1;}
-  | sentifmet {$$ = $1;}
+  | sentdowhilemet {$$ = $1; }
+  | sentformet { $$ = $1; }
+  | sentifmet {$$ = $1; }
   | sentswitchmet { $$ = $1;}
   | declavar { $$ = $1;}
   | sentretmet { $$ = $1;}
@@ -252,9 +252,11 @@ varmet : asigvar   { $$ = $1;}
 parametros : parametros COMA tipo IDENTIFICADOR   { $$ = $1; $$.push(new Nodo("PARAMETRO",$3)); $$[$$.length-1].sentencias.push(new Nodo("VARIABLE",$4));}
            | tipo IDENTIFICADOR                   { $$ = []; $$.push(new Nodo("PARAMETRO",$1)); $$[0].sentencias.push(new Nodo("VARIABLE",$2)); }
 ;
+
 listaparametros: parametros PARDER {$$ = $1}
                | PARDER            {$$ = null}
 ;
+
 metodo : VOID MAIN PARIZQ PARDER instmetodo { $$ = new Nodo("MAIN",$2); if($5 != null) $$.setHijos($5);}
       |  VOID IDENTIFICADOR PARIZQ listaparametros instmetodo { $$ = new Nodo("METODO",$2); if($4!=null) $$.setHijos($4); if($5 != null) $$.agregarHijos($5);}
 ;
@@ -263,7 +265,7 @@ instmetodo : LLAVEIZQ instruccionesifmet LLAVEDER   {$$ = $2;}
            | LLAVEIZQ LLAVEDER                      {$$ = null;}
 ;
 
-funcion : tipo IDENTIFICADOR PARIZQ listaparametros instfun { $$ = new Nodo("FUNCION",$2); if($4!= null) $$.setHijos($4);$$.agregarHijos($5);}
+funcion : tipo IDENTIFICADOR PARIZQ listaparametros instfun { $$ = new Nodo("FUNCION",$1 + " " +$2); if($4!= null) $$.setHijos($4);$$.agregarHijos($5);}
 ;
 
 repfun : LLAVEIZQ instruccionesrepfun LLAVEDER  { $$ = $2; }
@@ -276,16 +278,16 @@ iffun : LLAVEIZQ instruccionesiffun LLAVEDER  { $$ = $2; }
 
 sentwhilefun : WHILE condicion repfun{ $$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2)};
 
-sentforfun : FOR PARIZQ inifor PTCOMA expresion PTCOMA IDENTIFICADOR operador PARDER repfun {$$ = new Nodo("SENTENCIAFOR",$1); if($10 != null) $$.setHijos($10); $$.sentencias.unshift($8); $$.sentencias.unshift(new Nodo("CONDICION","")) ; $$.sentencias[0].sentencias.push($5); $$.sentencias.unshift($3);};
+sentforfun : FOR PARIZQ inifor PTCOMA expresion PTCOMA IDENTIFICADOR operador PARDER repfun {$$ = new Nodo("SENTENCIA",$1); if($10 != null) $$.setHijos($10); $$.sentencias.unshift($8); $$.sentencias.unshift(new Nodo("CONDICION","CONDICION")) ; $$.sentencias[0].sentencias.push($5); $$.sentencias.unshift($3);};
 
 sentiffun : IF condicion iffun {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);}
-   | IF condicion iffun ELSE iffun {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);$$.sentencias.push(new Nodo("SENTENCI",$4)); if($5 != null) $$.sentencias[$$.sentencias.length-1].setHijos($5);}
+   | IF condicion iffun ELSE iffun {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);$$.sentencias.push(new Nodo("SENTENCIA",$4)); if($5 != null) $$.sentencias[$$.sentencias.length-1].setHijos($5);}
    | IF condicion iffun ELSE sentiffun {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3);$$.sentencias.unshift($2);$$.sentencias.push($5);}
 ;
 
 sentdowhilefun : DO repfun WHILE condicion PTCOMA { $$ = new Nodo("SENTENCIA",$1); if($2 != null) $$.setHijos($2);  $$.sentencias.push($4); };
 
-sentswitchfun : SWITCH PARIZQ expresion PARDER LLAVEIZQ casedeffun LLAVEDER {$$ = new Nodo("SENTENCIASWITCH",$1); $$.setHijos($6); $$.sentencias.unshift($3)};
+sentswitchfun : SWITCH PARIZQ expresion PARDER LLAVEIZQ casedeffun LLAVEDER {$$ = new Nodo("SENTENCIA",$1); $$.setHijos($6); $$.sentencias.unshift($3)};
 
 instruccionesiffun
 	: instruccionesiffun instruccioniffun {$$ = $1; $$.push($2);}

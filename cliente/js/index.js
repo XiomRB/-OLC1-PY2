@@ -1,5 +1,3 @@
-
-
 function analizar(){
     let url = "http://localhost:3000/api/"
     let principal = editor.getValue()
@@ -10,10 +8,6 @@ function analizar(){
             localStorage.setItem("ast",salida);
         } else alert("se encontro error " + status)
     })
-}
-
-function ver(){
-    alert(principal)
 }
 
 //ABRIR ARCHIVOS
@@ -28,11 +22,9 @@ function abrirArchivo(){
 function mostrarArchivo(e){
     var resultado = e.target.result
     if(editor.getValue() == "") editor.setValue(resultado)
-    else if(editorcopia1.getValue()=="")editorcopia1.setValue(resultado)
-    else if(editorcopia2.getValue()=="")editorcopia2.setValue(resultado)
-    else if(editorcopia3.getValue()=="")editorcopia3.setValue(resultado)
-    else if(editorcopia4.getValue()=="")editorcopia4.setValue(resultado)
-    else editor.setValue(resultado)
+    else if(editorcopia1.getValue() == "") editorcopia1.setValue(resultado)
+    else if(editorcopia2.getValue() == "") editorcopia2.setValue(resultado)
+    else if(editorcopia3.getValue() == "") editorcopia3.setValue(resultado)
 }
 
 function reportarArbol(){
