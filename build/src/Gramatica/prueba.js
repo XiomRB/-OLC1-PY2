@@ -7,24 +7,26 @@ var parser = require("./gramatica").parser;
 
 var twenty = exec("int id");
 console.log(twenty.valor);*/
-class analizador {
-    constructor(entrada) {
+var analizador = /** @class */ (function () {
+    function analizador(entrada) {
         this.raiz = this.ejecutarAnalizador(entrada);
     }
-    ejecutarAnalizador(entrada) {
+    analizador.prototype.ejecutarAnalizador = function (entrada) {
         return parser.parse(entrada);
-    }
-    imprimirArbol(root) {
+    };
+    analizador.prototype.imprimirArbol = function (root) {
+        var _this = this;
         if (root != null) {
             console.log(root.tipo);
-            root.sentencias.forEach(sentencia => {
-                this.imprimirArbol(sentencia);
+            root.sentencias.forEach(function (sentencia) {
+                _this.imprimirArbol(sentencia);
             });
         }
-    }
-    verArbol() {
+    };
+    analizador.prototype.verArbol = function () {
         this.imprimirArbol(this.raiz);
-    }
-}
+    };
+    return analizador;
+}());
 var analiza = new analizador("int id1,id2,id3");
 analiza.verArbol();

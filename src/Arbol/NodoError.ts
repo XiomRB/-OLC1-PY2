@@ -1,4 +1,5 @@
-export default class NodoError{
+export class NodoError {
+
     private tipo:string;
     private descripcion:string;
     private linea:number;

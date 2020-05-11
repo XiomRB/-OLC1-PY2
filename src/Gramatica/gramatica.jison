@@ -99,6 +99,7 @@
 
 ini
 	: arch EOF {$$ = new Nodo("RAIZ","RAIZ"); $$.setHijos($1); return $$;}
+   | error      { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
 ;
 
 clase : CLASS IDENTIFICADOR instclase {$$ = new Nodo("CLASE",$2); if($3!=null) $$.setHijos($3)} ;

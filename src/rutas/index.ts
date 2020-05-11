@@ -4,43 +4,56 @@ import Clase from '../AnalizarCopia/Clase'
 import Nodo from '../Arbol/Nodo'
 import Variable from '../AnalizarCopia/Variable'
 import Funcion from '../AnalizarCopia/Metodo'
+import {Errores} from '../Arbol/Errores'
 
 const router:Router = Router();
 var resultadoprincipal:Nodo;
-var resultadocopia:Nodo; ///quitarlo
 var listacopias:Array<Nodo> = [];
 
 router.post('/',(req,res)=>{
     var entrada = req.body.text;
     var resultado;
-    resultadoprincipal = parser.parse(entrada)
-    if(entrada != "") resultado = convertir(entrada);
+    Errores.clear();
+    if(entrada != "") {
+        resultadoprincipal = parser.parse(entrada)
+        if(Errores.verificarerror() == "Se Detectaron Errores de Compilacion"){
+            resultado = "Existen errores en el archivo"
+        }else resultado = convertir(entrada);
+    }
     else resultado = "No hay texto"
     res.send(resultado)
 })
 
 router.post('/textos',(req,res)=>{
-    var entrada = req.body.text
-    console.log(entrada)
-    var r;
-    if(entrada != ""){
-        resultadocopia = parser.parse(entrada)
-        let copia = new Clase();
-        copia.verificar(resultadoprincipal,resultadocopia)
-        if(copia.clasecopia) r = "Es copia"
-        else r = "No es copia"
-    } 
-    else r = "No se leyo nada"
+    var entrada = req.body['text[]']
+    listacopias = []
+    Errores.clear()
+    let r = "Archivos analizados"
+    if(entrada.length > 3){
+        let nodoN:Nodo = parser.parse(entrada)
+        if(Errores.verificarerror() == "Se Detectaron Errores de Compilacion") r = "Errores en los archivos"
+        else listacopias.push(nodoN)
+    }else{
+        for (let index = 0; index < entrada.length; index++) {
+            let nodoN:Nodo = parser.parse(entrada[index])
+            if(Errores.verificarerror() == "Se Detectaron Errores de Compilacion"){
+                r = "Errores en los archivos"
+                break
+            }
+            listacopias.push(nodoN)
+        }
+    }
     res.send(r)
 });
 
-router.post('/textos/prueba',(req,res)=>{
-    let entrada = req.body['text[]']
-    listacopias = []
-    for (let index = 0; index < entrada.length; index++) listacopias.push(parser.parse(entrada[index]))
-    let r ;
-    if(entrada.length != 0) r = analizarCopiasClase()
-    else  r = ""
+router.post('/textos/errores',(req,res)=>{
+    let r = Errores.geterror()
+    res.send(r)
+})
+
+router.post('/textos/clase',(req,res)=>{
+    let entrada = req.body.text
+    let r = analizarCopiasClase()
     res.send(r)
 });
 

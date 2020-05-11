@@ -1,18 +1,20 @@
-
-class NodoError {
-    constructor(tipo, descripcion, linea) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var NodoError = /** @class */ (function () {
+    function NodoError(tipo, descripcion, linea) {
         this.tipo = tipo;
         this.descripcion = descripcion;
         this.linea = (linea + 1);
     }
-    gettipo() {
+    NodoError.prototype.gettipo = function () {
         return this.tipo;
-    }
-    getdescripcion() {
+    };
+    NodoError.prototype.getdescripcion = function () {
         return this.descripcion;
-    }
-    getlinea() {
+    };
+    NodoError.prototype.getlinea = function () {
         return this.linea;
-    }
-}
-module.exports = NodoError;
+    };
+    return NodoError;
+}());
+exports.NodoError = NodoError;

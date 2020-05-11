@@ -1,19 +1,19 @@
-
-class Nodo {
-    constructor(tipo, valor) {
+var Nodo = /** @class */ (function () {
+    function Nodo(tipo, valor) {
         this.tipo = tipo;
         this.valor = valor;
         this.sentencias = [];
     }
-    getSentencia(indice) {
+    Nodo.prototype.getSentencia = function (indice) {
         return this.sentencias[indice];
-    }
-    setHijos(sentencias) {
+    };
+    Nodo.prototype.setHijos = function (sentencias) {
         this.sentencias = sentencias;
-    }
-    agregarHijos(sentencias) {
-        for (let i = 0; i < sentencias.length; i++)
+    };
+    Nodo.prototype.agregarHijos = function (sentencias) {
+        for (var i = 0; i < sentencias.length; i++)
             this.sentencias.push(sentencias[i]);
-    }
-}
+    };
+    return Nodo;
+}());
 module.exports = Nodo;

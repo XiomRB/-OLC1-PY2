@@ -1,6 +1,6 @@
-import NodoError from './NodoError'
+import { NodoError } from "./NodoError";
 
-export default class Errores extends Array<NodoError>{
+class Errores extends Array<NodoError>{
 
     constructor(){
         super();
@@ -19,14 +19,8 @@ export default class Errores extends Array<NodoError>{
 
     public static geterror():string{
         var cad:string="";
-        cad+="<html>\n";
-            cad+="<header>\n";
-                cad+="<title>Reporte Errores</title>\n";
-            cad+="</header>\n";
-            cad+="<body background=\"gray\">\n";
-                cad+="<div align=\"center\">\n";
                     cad+="<h1>Reporte de Errores de Compilacion</h1>\n";
-                    cad+="<table border=\"2\" align=\"center\">\n";
+                    cad+="<table  border=\"2\" align=\"center\">\n";
                         cad+="<tr>\n";
                             cad+="<th>TIPO DE ERROR</th><th>DESCRIPCION</th><th>LINEA</th>\n";
                         cad+="</tr>\n";
@@ -38,10 +32,6 @@ export default class Errores extends Array<NodoError>{
                             cad+="</tr>\n";
                         }
                     cad+="</table>\n";
-                cad+="</div>\n";
-            cad+="</body>\n";
-        cad+="</html>\n";
-
         return cad;
     }
 
@@ -51,3 +41,4 @@ export default class Errores extends Array<NodoError>{
         }
     }
 }
+export{Errores};

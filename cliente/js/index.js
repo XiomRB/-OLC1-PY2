@@ -4,7 +4,9 @@ function analizar(){
     $.post(url,{text:principal},function(data,status){
         if (status.toString() == "success") {
             console.log("El resultado es: " + data)
-            var salida = data;
+            var salida = "";
+            if(data == "Existen errores en el archivo") alert(data)
+            else salida = data
             localStorage.setItem("ast",salida);
         } else alert("se encontro error " + status)
     })

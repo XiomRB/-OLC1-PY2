@@ -1,5 +1,7 @@
 %{
     const Nodo = require('../Arbol/Nodo');
+    var CErrores=require('../Arbol/Errores');
+    var CNodoError=require('../Arbol/NodoError');
 %}
 
 /* Definición Léxica */
@@ -75,7 +77,7 @@
 
 <<EOF>>				return 'EOF';
 
-.					{ console.error('Este es un error léxico: ' + yytext + ', en la linea: ' + yylloc.first_line + ', en la columna: ' + yylloc.first_column); }
+.					{ CErrores.Errores.add(new CNodoError.NodoError("Lexico","No se esperaba el caracter: "+yytext,yylineno)) }
 /lex
 
 
@@ -99,6 +101,7 @@
 
 ini
 	: arch EOF {$$ = new Nodo("RAIZ","RAIZ"); $$.setHijos($1); return $$;}
+  | error { CErrores.Errores.add(new CNodoError.NodoError("Sintactico","No se esperaba : "+yytext,yylineno)) }
 ;
 
 clase : CLASS IDENTIFICADOR instclase {$$ = new Nodo("CLASE",$2); if($3!=null) $$.setHijos($3)} ;

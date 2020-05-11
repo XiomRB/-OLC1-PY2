@@ -15,7 +15,7 @@ class analizador{
     }
 
     ejecutarAnalizador(entrada:string){
-        return parser.parse(entrada);
+        return parser.parse(entrada)
     }
 
     imprimirArbol(root:Nodo){

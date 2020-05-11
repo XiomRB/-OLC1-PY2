@@ -20,10 +20,15 @@ export default class ClaseCopia{
             if (JSON.stringify(tablaoriginal[0]) == JSON.stringify(tablacopia[0])) {
                 this.nombre = tablaoriginal[0].nombre
                 for (let index = 1; index < tablaoriginal.length; index++) {
-                    if(JSON.stringify(tablaoriginal[index]) == JSON.stringify(tablacopia[index])){
-                        if(tablaoriginal[index].tipo == "FUNCION") this.funciones++
-                        else this.metodos++
-                    }else{
+                    let j
+                    for (j = 1; j < tablacopia.length; j++) {
+                        if(JSON.stringify(tablaoriginal[index]) == JSON.stringify(tablacopia[j])){
+                            if(tablaoriginal[index].tipo == "FUNCION") this.funciones++
+                            else this.metodos++
+                            break
+                        }
+                    }
+                    if(j == tablacopia.length){
                         this.clasecopia = false;
                         return
                     }
