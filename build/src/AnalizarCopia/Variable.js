@@ -26,8 +26,10 @@ var Variable = /** @class */ (function () {
                     if (v.tipo == "DECLARACION") {
                         var nueva = new Var(v.valor, f.valor);
                         for (var j = 0; j < v.sentencias.length; j++) {
-                            if (v.getSentencia(j).tipo == "VARIABLE")
-                                nueva.nombre.push(v.getSentencia(j).valor);
+                            if (v.getSentencia(j).tipo == "VARIABLE") {
+                                var nuevavar = new ListaVar(v.getSentencia(j).valor);
+                                nueva.nombre.push(nuevavar);
+                            }
                         }
                         l.push(nueva);
                     }
@@ -37,6 +39,7 @@ var Variable = /** @class */ (function () {
         return origen;
     };
     Variable.prototype.verificar = function (original, copia) {
+        this.variables = [];
         var origen = this.verificarFuncion(original, this.variables);
         var l = [];
         var copy = this.verificarFuncion(copia, l);
@@ -50,25 +53,21 @@ var Variable = /** @class */ (function () {
                         for (k = 0; k < this.variables[i].nombre.length; k++) {
                             var m = void 0;
                             for (m = 0; m < l[j].nombre.length; m++) {
-                                if (this.variables[i].nombre[k] == l[j].nombre[m])
+                                if (this.variables[i].nombre[k].nombre == l[j].nombre[m].nombre) {
+                                    this.variables[i].nombre[k].esCopia = true;
                                     break;
+                                }
                             }
-                            if (m == l[j].nombre.length)
-                                this.variables[i].nombre.splice(k, 1);
-                            else
-                                break;
                         }
                         if (k != this.variables[i].nombre.length)
                             break;
                     }
                 }
-                console.log(j + " original " + i);
-                if (j == l.length) {
-                    this.variables.splice(i, 1);
-                    i--;
-                }
             }
         }
+        else
+            while (this.variables.length > 0)
+                this.variables.pop();
     };
     return Variable;
 }());
@@ -80,4 +79,11 @@ var Var = /** @class */ (function () {
         this.funcion = f;
     }
     return Var;
+}());
+var ListaVar = /** @class */ (function () {
+    function ListaVar(name) {
+        this.nombre = name;
+        this.esCopia = false;
+    }
+    return ListaVar;
 }());

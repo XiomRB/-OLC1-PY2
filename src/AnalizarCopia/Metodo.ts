@@ -50,6 +50,10 @@ export default class Funcion{
                     this.listafunciones.splice(i,this.listafunciones.length-i)
                 }
             }
+        }else{
+            while(this.listafunciones.length > 0) this.listafunciones.pop()
+            while(this.listaparametros.length > 0) this.listaparametros.pop()
+            while(this.listaretornos.length > 0) this.listaretornos.pop()
         }
     }
 

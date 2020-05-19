@@ -100,12 +100,14 @@ function analizarCopiasVariables(){
         copia.verificar(resultadoprincipal,listacopias[index])
         if(copia.variables.length == 0)reporte += "<tr><td>" + (index + 1) + "</td><td>" + copia.nombre + "</td><td>---</td><td>---</td></tr>"
         for (let i = 0; i < copia.variables.length; i++) {
-            reporte += "<tr><td>" + (index + 1) + "</td><td>" + copia.nombre + "</td><td>" + copia.variables[i].funcion + "</td><td>"
             for (let j = 0; j < copia.variables[i].nombre.length; j++) {
-                if(j == copia.variables[i].nombre.length-1) reporte += copia.variables[i].tipo + " " + copia.variables[i].nombre[j]
-                else reporte += copia.variables[i].tipo + " " + copia.variables[i].nombre[j] + "<br>"
+                if(copia.variables[i].nombre[j].esCopia){
+                     reporte += "<tr><td>" + (index + 1) + "</td><td>" + copia.nombre + "</td><td>" + copia.variables[i].funcion + "</td><td>"
+                     reporte += copia.variables[i].tipo + " " + copia.variables[i].nombre[j].nombre + "</td></tr>\n"
+                    //else reporte += copia.variables[i].tipo + " " + copia.variables[i].nombre[j].nombre + "<br>"
+                }
             }
-            reporte += "</td></tr>\n"
+            //reporte += "</td></tr>\n"
         }
     }
     return reporte

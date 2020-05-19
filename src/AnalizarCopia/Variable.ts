@@ -26,7 +26,10 @@ export default class Variable{
                     if(v.tipo == "DECLARACION"){
                         let nueva = new Var(v.valor,f.valor)
                         for (let j = 0; j < v.sentencias.length; j++) {
-                            if(v.getSentencia(j).tipo == "VARIABLE") nueva.nombre.push(v.getSentencia(j).valor)
+                            if(v.getSentencia(j).tipo == "VARIABLE"){
+                                let nuevavar = new ListaVar(v.getSentencia(j).valor)
+                                nueva.nombre.push(nuevavar)
+                            } 
                         }
                         l.push(nueva)
                     }
@@ -37,6 +40,7 @@ export default class Variable{
     }
 
     verificar(original:Nodo,copia:Nodo){
+        this.variables = [];
         let origen:Nodo = this.verificarFuncion(original,this.variables)
         let l:Array<Var> = []
         let copy:Nodo = this.verificarFuncion(copia,l)
@@ -50,33 +54,38 @@ export default class Variable{
                             for (k = 0; k < this.variables[i].nombre.length; k++) {
                                 let m;
                                 for (m = 0; m < l[j].nombre.length; m++) {
-                                    if(this.variables[i].nombre[k] == l[j].nombre[m])break
+                                    if(this.variables[i].nombre[k].nombre == l[j].nombre[m].nombre){
+                                        this.variables[i].nombre[k].esCopia = true;
+                                        break
+                                    }
                                 }
-                                if(m == l[j].nombre.length) this.variables[i].nombre.splice(k,1)
-                                else break
                             }
                             if(k != this.variables[i].nombre.length) break
-                        
                     }
-                }
-                console.log(j + " original " + i )
-                if(j == l.length){
-                    this.variables.splice(i,1)
-                    i--
                 } 
             }
-        }
+        }else while(this.variables.length > 0) this.variables.pop()
     }
 }
 
 class Var{
     tipo:string
-    nombre:Array<string> //LISTA DE IDs
+    nombre:Array<ListaVar> //LISTA DE IDs
     funcion:string
 
     constructor(t:string,f:string){
         this.tipo = t
         this.nombre = []
         this.funcion = f
+    }
+}
+
+class ListaVar{
+    nombre: string;
+    esCopia:boolean;
+
+    constructor(name:string){
+       this.nombre = name
+       this.esCopia = false;
     }
 }

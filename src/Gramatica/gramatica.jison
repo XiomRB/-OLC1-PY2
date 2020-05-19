@@ -1,5 +1,7 @@
 %{
-    const Nodo = require('../Arbol/Nodos');
+    const Nodo = require('../Arbol/Nodo');
+    var CErrores=require('../Arbol/Errores');
+    var CNodoError=require('../Arbol/NodoError');
 %}
 
 /* Definición Léxica */
@@ -75,7 +77,7 @@
 
 <<EOF>>				return 'EOF';
 
-.					{ console.error('Este es un error léxico: ' + yytext + ', en la linea: ' + yylloc.first_line + ', en la columna: ' + yylloc.first_column); }
+.					{ CErrores.Errores.add(new CNodoError.NodoError("Lexico","No se esperaba el caracter: "+yytext,yylineno)) }
 /lex
 
 
@@ -99,7 +101,7 @@
 
 ini
 	: arch EOF {$$ = new Nodo("RAIZ","RAIZ"); $$.setHijos($1); return $$;}
-   | error      { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+  | error { CErrores.Errores.add(new CNodoError.NodoError("Sintactico","No se esperaba : "+yytext,yylineno)) }
 ;
 
 clase : CLASS IDENTIFICADOR instclase {$$ = new Nodo("CLASE",$2); if($3!=null) $$.setHijos($3)} ;
@@ -176,6 +178,14 @@ ifmet : LLAVEIZQ instruccionesifmet LLAVEDER    { $$ = $2; }
       | LLAVEIZQ LLAVEDER                       { $$ = null; }
 ;
 
+ifmetrep : LLAVEIZQ instruccionesifmetrep LLAVEDER    { $$ = $2; }
+      | LLAVEIZQ LLAVEDER                       { $$ = null; }
+;
+
+ifmetw : LLAVEIZQ instruccionesifmetw LLAVEDER    { $$ = $2; }
+      | LLAVEIZQ LLAVEDER                       { $$ = null; }
+;
+
 sentwhilemet : WHILE condicion repmet { $$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2)};
 
 sentformet : FOR PARIZQ inifor PTCOMA expresion PTCOMA IDENTIFICADOR operador PARDER repmet {$$ = new Nodo("SENTENCIA",$1); if($10 != null) $$.setHijos($10); $$.sentencias.unshift($8); $$.sentencias.unshift(new Nodo("CONDICION","CONDICION")) ; $$.sentencias[0].sentencias.push($5); $$.sentencias.unshift($3);};
@@ -185,9 +195,21 @@ sentifmet : IF condicion ifmet {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$
    | IF condicion ifmet ELSE sentifmet {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3);$$.sentencias.unshift($2);$$.sentencias.push($5);}
 ;
 
+sentifmetrep : IF condicion ifmetrep {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);}
+   | IF condicion ifmetrep ELSE ifmetrep {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);$$.sentencias.push(new Nodo("SENTENCIA",$4)); if($5 != null) $$.sentencias[$$.sentencias.length-1].setHijos($5);}
+   | IF condicion ifmetrep ELSE sentifmetrep {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3);$$.sentencias.unshift($2);$$.sentencias.push($5);}
+;
+
+sentifmetw : IF condicion ifmetw {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);}
+   | IF condicion ifmetw ELSE ifmetw {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);$$.sentencias.push(new Nodo("SENTENCIA",$4)); if($5 != null) $$.sentencias[$$.sentencias.length-1].setHijos($5);}
+   | IF condicion ifmetw ELSE sentifmetw {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3);$$.sentencias.unshift($2);$$.sentencias.push($5);}
+;
+
 sentdowhilemet : DO repmet WHILE condicion PTCOMA { $$ = new Nodo("SENTENCIA",$1); if($2 != null) $$.setHijos($2);  $$.sentencias.push($4); };
 
 sentswitchmet : SWITCH PARIZQ expresion PARDER LLAVEIZQ casedef LLAVEDER {$$ = new Nodo("SENTENCIA",$1); $$.setHijos($6); $$.sentencias.unshift($3)};
+
+sentswitchmetrep : SWITCH PARIZQ expresion PARDER LLAVEIZQ casedefrep LLAVEDER {$$ = new Nodo("SENTENCIA",$1); $$.setHijos($6); $$.sentencias.unshift($3)};
 
 inifor: tipo IDENTIFICADOR ASIGNADOR expresion {$$ = new Nodo("DECLARACION",$1); $$.sentencias.push(new Nodo("VARIABLE",$2));$$.sentencias[0].sentencias.push($4);}
       | IDENTIFICADOR ASIGNADOR expresion {$$ = new Nodo("ASIGNACION",$1); $$.sentencias.push($3);}
@@ -198,7 +220,15 @@ listacase : listacase CASE expresion DOSPUNTOS instruccioneswemet      {$$ = $1;
 ;
 
 casedef : listacase {$$ = $1;}
-        | listacase DEFAULT DOSPUNTOS {$$ = $1; $$.push(new Nodo("DEFAULT",$2)) }
+        | listacase DEFAULT DOSPUNTOS instruccioneswemet  {$$ = $1; $$.push(new Nodo("DEFAULT",$2)) }
+;
+
+listacaserep : listacaserep CASE expresion DOSPUNTOS instruccionesifmetrep      {$$ = $1; $$.push(new Nodo("CASE",$1)); $$[$$.length-1].setHijos($5);}
+          | CASE expresion DOSPUNTOS instruccionesifmetrep             {$$ = []; $$.push(new Nodo("CASE",$1)); $$[0].setHijos($4);}
+;
+
+casedefrep : listacaserep {$$ = $1;}
+        | listacaserep DEFAULT DOSPUNTOS instruccionesifmetrep {$$ = $1; $$.push(new Nodo("DEFAULT",$2)) }
 ;
 
 sentbreak : BREAK PTCOMA {$$ = new Nodo("SENTENCIA",$1);};
@@ -230,8 +260,47 @@ instruccionifmet
   | IDENTIFICADOR varmet { $$ = $2; if($$ != null) $$.valor = $1}
 ;
 
-instruccionesrepmet : instruccionesrepmet instruccionrepmet   {$$ = $1; $$.push($2);}
-                    | instruccionrepmet                       {$$ = []; $$.push($1);}
+instruccionesifmetw
+	: instruccionesifmetw instruccionifmetw {$$ = $1; $$.push($2);}
+	| instruccionifmetw {$$ = []; $$.push($1);}
+;
+
+instruccionifmetw
+	: sout  {$$ = $1;}
+  | sentwhilemet {$$ = $1;}
+  | sentdowhilemet {$$ = $1; }
+  | sentformet { $$ = $1; }
+  | sentifmetw {$$ = $1; }
+  | sentswitchmet { $$ = $1;}
+  | declavar { $$ = $1;}
+  | sentretmet { $$ = $1;}
+  | IDENTIFICADOR llamada PTCOMA { $$ = new Nodo("LLAMADA",$1); $$.setHijos($2); if($$ != null) $$.valor = $1} 
+  | IDENTIFICADOR varmet { $$ = $2; if($$ != null) $$.valor = $1}
+  | sentbreak    {$$ =$1}
+;
+
+instruccionesifmetrep
+	: instruccionesifmetrep instruccionifmetrep {$$ = $1; $$.push($2);}
+	| instruccionifmetrep {$$ = []; $$.push($1);}
+;
+
+instruccionifmetrep
+	: sout  {$$ = $1;}
+  | sentwhilemet {$$ = $1;}
+  | sentdowhilemet {$$ = $1; }
+  | sentformet { $$ = $1; }
+  | sentifmetrep {$$ = $1; }
+  | sentswitchmetrep { $$ = $1;}
+  | declavar { $$ = $1;}
+  | sentretmet { $$ = $1;}
+  | IDENTIFICADOR llamada PTCOMA { $$ = new Nodo("LLAMADA",$1); $$.setHijos($2); if($$ != null) $$.valor = $1} 
+  | IDENTIFICADOR varmet { $$ = $2; if($$ != null) $$.valor = $1}
+  | sentbreak { $$ = $1; }
+  | sentcont  { $$ = $1; }
+;
+
+instruccionesrepmet : instruccionesrepmet instruccionifmetrep   {$$ = $1; $$.push($2);}
+                    | instruccionifmetrep                       {$$ = []; $$.push($1);}
 ; 
 
 instruccionrepmet : instruccionswmet  {$$ = $1;}
@@ -242,8 +311,8 @@ instruccionswmet : instruccionifmet   {$$ = $1;}
                  | sentbreak          {$$ = $1;}
 ;
 
-instruccioneswemet: instruccioneswemet instruccionswmet {$$ = $1; $$.push($2);}
-                  | instruccionswmet                    {$$ = []; $$.push($1);}
+instruccioneswemet: instruccioneswemet instruccionifmetw {$$ = $1; $$.push($2);}
+                  | instruccionifmetw                    {$$ = []; $$.push($1);}
 ;
 
 varmet : asigvar   { $$ = $1;}
@@ -277,6 +346,14 @@ iffun : LLAVEIZQ instruccionesiffun LLAVEDER  { $$ = $2; }
        | LLAVEIZQ LLAVEDER                    { $$ = null; }
 ;
 
+iffunrep : LLAVEIZQ instruccionesiffunrep LLAVEDER  { $$ = $2; }
+       | LLAVEIZQ LLAVEDER                    { $$ = null; }
+;
+
+iffunw : LLAVEIZQ instruccionesiffunw LLAVEDER  { $$ = $2; }
+       | LLAVEIZQ LLAVEDER                    { $$ = null; }
+;
+
 sentwhilefun : WHILE condicion repfun{ $$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2)};
 
 sentforfun : FOR PARIZQ inifor PTCOMA expresion PTCOMA IDENTIFICADOR operador PARDER repfun {$$ = new Nodo("SENTENCIA",$1); if($10 != null) $$.setHijos($10); $$.sentencias.unshift($8); $$.sentencias.unshift(new Nodo("CONDICION","CONDICION")) ; $$.sentencias[0].sentencias.push($5); $$.sentencias.unshift($3);};
@@ -286,9 +363,21 @@ sentiffun : IF condicion iffun {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$
    | IF condicion iffun ELSE sentiffun {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3);$$.sentencias.unshift($2);$$.sentencias.push($5);}
 ;
 
+sentiffunrep : IF condicion iffunrep {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);}
+   | IF condicion iffunrep ELSE iffunrep {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);$$.sentencias.push(new Nodo("SENTENCIA",$4)); if($5 != null) $$.sentencias[$$.sentencias.length-1].setHijos($5);}
+   | IF condicion iffunrep ELSE sentiffunrep {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3);$$.sentencias.unshift($2);$$.sentencias.push($5);}
+;
+
+sentiffunw : IF condicion iffunw {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);}
+   | IF condicion iffunw ELSE iffunw {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3); $$.sentencias.unshift($2);$$.sentencias.push(new Nodo("SENTENCIA",$4)); if($5 != null) $$.sentencias[$$.sentencias.length-1].setHijos($5);}
+   | IF condicion iffunw ELSE sentiffunw {$$ = new Nodo("SENTENCIA",$1); if($3 != null) $$.setHijos($3);$$.sentencias.unshift($2);$$.sentencias.push($5);}
+;
+
 sentdowhilefun : DO repfun WHILE condicion PTCOMA { $$ = new Nodo("SENTENCIA",$1); if($2 != null) $$.setHijos($2);  $$.sentencias.push($4); };
 
 sentswitchfun : SWITCH PARIZQ expresion PARDER LLAVEIZQ casedeffun LLAVEDER {$$ = new Nodo("SENTENCIA",$1); $$.setHijos($6); $$.sentencias.unshift($3)};
+
+sentswitchfunrep : SWITCH PARIZQ expresion PARDER LLAVEIZQ casedeffunrep LLAVEDER {$$ = new Nodo("SENTENCIA",$1); $$.setHijos($6); $$.sentencias.unshift($3)};
 
 instruccionesiffun
 	: instruccionesiffun instruccioniffun {$$ = $1; $$.push($2);}
@@ -308,8 +397,47 @@ instruccioniffun
   | IDENTIFICADOR varmet { $$ = $2; if($$ != null) $$.valor = $1}
 ;
 
-instruccionesrepfun : instruccionesrepfun instruccionrepfun  {$$ = $1; $$.push($2);}
-                    | instruccionrepfun                       {$$ = []; $$.push($1);}
+instruccionesiffunrep
+	: instruccionesiffunrep instruccioniffunrep {$$ = $1; $$.push($2);}
+	| instruccioniffunrep {$$ = []; $$.push($1);}
+;
+
+instruccioniffunrep
+	: sout  {$$ = $1;}
+  | sentwhilefun {$$ = $1;}
+  | sentdowhilefun {$$ = $1;}
+  | sentforfun { $$ = $1;}
+  | sentiffunrep {$$ = $1;}
+  | sentswitchfunrep { $$ = $1;}
+  | declavar { $$ = $1;}
+  | sentretfun { $$ = $1;}
+  | IDENTIFICADOR llamada PTCOMA { $$ = new Nodo("LLAMADA",$1); $$.setHijos($2); if($$ != null) $$.valor = $1} 
+  | IDENTIFICADOR varmet { $$ = $2; if($$ != null) $$.valor = $1}
+  | sentbreak {$$ = $1;}
+  | sentcont  {$$ = $1;}
+;
+
+instruccionesiffunw
+	: instruccionesiffunw instruccioniffunw {$$ = $1; $$.push($2);}
+	| instruccioniffunw {$$ = []; $$.push($1);}
+;
+
+instruccioniffunw
+	: sout  {$$ = $1;}
+  | sentwhilefun {$$ = $1;}
+  | sentdowhilefun {$$ = $1;}
+  | sentforfun { $$ = $1;}
+  | sentiffunw {$$ = $1;}
+  | sentswitchfun { $$ = $1;}
+  | declavar { $$ = $1;}
+  | sentretfun { $$ = $1;}
+  | IDENTIFICADOR llamada PTCOMA { $$ = new Nodo("LLAMADA",$1); $$.setHijos($2); if($$ != null) $$.valor = $1} 
+  | IDENTIFICADOR varmet { $$ = $2; if($$ != null) $$.valor = $1}
+  | sentbreak {$$ = $1;}
+;
+
+instruccionesrepfun : instruccionesrepfun instruccioniffunrep  {$$ = $1; $$.push($2);}
+                    | instruccioniffunrep                       {$$ = []; $$.push($1);}
 ; 
 
 instruccionrepfun : instruccionswfun  {$$ = $1;}
@@ -320,8 +448,8 @@ instruccionswfun : instruccioniffun   {$$ = $1;}
                  | sentbreak          {$$ = $1;}
 ;
 
-instruccioneswefun: instruccioneswefun instruccionswfun {$$ = $1; $$.push($2);}
-                  | instruccionswfun                   {$$ = []; $$.push($1);}
+instruccioneswefun: instruccioneswefun instruccioniffunw {$$ = $1; $$.push($2);}
+                  | instruccioniffunw                    {$$ = []; $$.push($1);}
 ;
 
 listacasef : listacasef CASE expresion DOSPUNTOS instruccioneswefun      {$$ = $1; $$.push(new Nodo("CASE",$1)); $$[$$.length-1].setHijos($5);}
@@ -329,7 +457,15 @@ listacasef : listacasef CASE expresion DOSPUNTOS instruccioneswefun      {$$ = $
 ;
 
 casedeffun : listacasef {$$ = $1;}
-        | listacasef DEFAULT DOSPUNTOS {$$ = $1; $$.push(new Nodo("DEFAULT",$2)) }
+        | listacasef DEFAULT DOSPUNTOS instruccioneswefun {$$ = $1; $$.push(new Nodo("DEFAULT",$2)) }
+;
+
+listacasefrep : listacasefrep CASE expresion DOSPUNTOS instruccionesiffunrep      {$$ = $1; $$.push(new Nodo("CASE",$1)); $$[$$.length-1].setHijos($5);}
+          | CASE expresion DOSPUNTOS instruccionesiffunrep                {$$ = []; $$.push(new Nodo("CASE",$1)); $$[0].setHijos($4);}
+;
+
+casedeffunrep : listacasefrep {$$ = $1;}
+              | listacasefrep DEFAULT DOSPUNTOS instruccionesiffunrep {$$ = $1; $$.push(new Nodo("DEFAULT",$2)) }
 ;
 
 instfun : LLAVEIZQ instrucsfun sentretfun LLAVEDER   {$$ = $2; $$.push($3);}
