@@ -75,7 +75,7 @@ function analizarCopiasClase(){
         let copia = new Clase()
         copia.verificar(resultadoprincipal,listacopias[index])
         if(copia.clasecopia) reporte +=  "<tr><td>" + (index + 1) + "</td><td>" + copia.nombre + "</td><td>" + copia.metodos + "</td><td>" + copia.funciones + "</td></tr>\n"
-        else reporte += "<tr><td>" + index + "</td><td>---</td><td>---</td><td>---</td></tr>\n"
+        else reporte += "<tr><td>" + (index + 1) + "</td><td>---</td><td>---</td><td>---</td></tr>\n"
     }
     return reporte
 }
@@ -87,7 +87,12 @@ function analizarCopiasFunciones(){
         copia.verificar(resultadoprincipal,listacopias[index])
         if(copia.listafunciones.length == 0) reporte += "<tr><td>" + (index + 1) + "</td><td>" + copia.nombre + "</td><td>---</td><td>---</td><td>---</td></tr>"
         for (let i = 0; i < copia.listafunciones.length; i++) {
-            reporte += "<tr><td>" + (index + 1) + "</td><td>" + copia.nombre + "</td><td>" + copia.listafunciones[i] + "</td><td>" + copia.listaparametros[i] + "</td><td>" + copia.listaretornos[i] + "</td></tr>\n"
+            reporte += "<tr><td>" + (index + 1) + "</td><td>" + copia.nombre + "</td><td>" + copia.listafunciones[i] + "</td><td>" 
+            for (let j = 0; j < copia.listaparametros[i].length; j++) {
+                if(j == copia.listaparametros[i].length-1) reporte += copia.listaparametros[i][j].tipo + " " + copia.listaparametros[i][j].nombre
+                else reporte += copia.listaparametros[i][j].tipo + " " + copia.listaparametros[i][j].nombre + ", "
+            }
+            reporte += "</td><td>" + copia.listaretornos[i] + "</td></tr>\n"
         }
     }
     return reporte
@@ -100,14 +105,12 @@ function analizarCopiasVariables(){
         copia.verificar(resultadoprincipal,listacopias[index])
         if(copia.variables.length == 0)reporte += "<tr><td>" + (index + 1) + "</td><td>" + copia.nombre + "</td><td>---</td><td>---</td></tr>"
         for (let i = 0; i < copia.variables.length; i++) {
-            for (let j = 0; j < copia.variables[i].nombre.length; j++) {
-                if(copia.variables[i].nombre[j].esCopia){
+            for (let j = 0; j < copia.variables[i].variables.length; j++) {
+                if(copia.variables[i].variables[j].esCopia){
                      reporte += "<tr><td>" + (index + 1) + "</td><td>" + copia.nombre + "</td><td>" + copia.variables[i].funcion + "</td><td>"
-                     reporte += copia.variables[i].tipo + " " + copia.variables[i].nombre[j].nombre + "</td></tr>\n"
-                    //else reporte += copia.variables[i].tipo + " " + copia.variables[i].nombre[j].nombre + "<br>"
+                     reporte += copia.variables[i].variables[j].tipo + " " + copia.variables[i].variables[j].nombre + "</td></tr>\n"
                 }
             }
-            //reporte += "</td></tr>\n"
         }
     }
     return reporte

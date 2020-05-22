@@ -59,7 +59,12 @@ export default class ClaseCopia{
         for (let index = 0; index < original.sentencias.length; index++) {
             let nodo:Nodo = original.getSentencia(index)
             if(nodo.tipo == "METODO" || nodo.tipo == "FUNCION" || nodo.tipo == "MAIN"){
-                tabla.push(new Objeto(nodo.tipo,nodo.valor))
+                let fm = new Objeto(nodo.tipo,nodo.valor)
+                for (let j = 0; j < nodo.sentencias.length; j++) {
+                    if(nodo.getSentencia(j).tipo == "PARAMETRO") fm.parametros.push(nodo.getSentencia(j).valor)
+                    else break
+                }
+                tabla.push(fm)
             }
         }
     }
@@ -68,9 +73,11 @@ export default class ClaseCopia{
 class Objeto{
     tipo:string;
     nombre:string;
+    parametros:Array<string>;
 
     constructor(t:string,n:string){
         this.tipo = t;
         this.nombre = n;
+        this.parametros = [];
     }
 }

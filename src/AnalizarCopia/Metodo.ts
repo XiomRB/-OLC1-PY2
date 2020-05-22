@@ -1,7 +1,7 @@
 import Nodo from '../Arbol/Nodo'
 
 export default class Funcion{
-    listaparametros:Array<string>;
+    listaparametros:Array<Array<Parametro>>;
     listafunciones:Array<string>;
     listaretornos:Array<string>;
     nombre:string;
@@ -16,7 +16,7 @@ export default class Funcion{
     verificar(original:Nodo,copia:Nodo){
         let origen:Nodo = this.verificarFunciones(original,this.listafunciones,this.listaparametros,this.listaretornos)
         var lf:Array<string> = [];
-        var lp:Array<string> = [];
+        var lp:Array<Array<Parametro>> = [];
         var lr:Array<string> = [];
         let copy:Nodo = this.verificarFunciones(copia,lf,lp,lr)
         if(origen.valor == copy.valor){
@@ -27,22 +27,25 @@ export default class Funcion{
                     let j = 0
                     while(j < lf.length){
                         if(this.listafunciones[i] == lf[j]){
-                            if(this.listaparametros[i] == lp[j]){
-                                if(this.listaretornos[i] == lr[j]){
-                                    i++
-                                    break
+                            if(this.listaretornos[i] == lr[j]){
+                                let x
+                                if(this.listaparametros[i].length == lp[j].length){
+                                    for (x = 0; x < this.listaparametros[i].length; x++) {
+                                        if(this.listaparametros[i][x].tipo != lp[j][x].tipo) break
+                                    }
+                                    if(x == this.listaparametros[i].length){
+                                        i++
+                                        break
+                                    }
                                 }
                             }
                         }
-                        if(j == lf.length-1){
-                            this.listafunciones.splice(i,1)
-                            this.listaparametros.splice(i,1)
-                            this.listaretornos.splice(i,1)
-                            lf.splice(i,1)
-                            lp.splice(i,1)
-                            lr.splice(i,1)
-                        }
                         j++
+                    }
+                    if(j == lf.length){
+                        this.listafunciones.splice(i,1)
+                        this.listaparametros.splice(i,1)
+                        this.listaretornos.splice(i,1)
                     }
 
                 }
@@ -66,7 +69,7 @@ export default class Funcion{
         return new Nodo("","");
     }
 
-    verificarFunciones(original:Nodo,lf:Array<string>,lp:Array<string>,lr:Array<string>){
+    verificarFunciones(original:Nodo,lf:Array<string>,lp:Array<Array<Parametro>>,lr:Array<string>){
         let origen:Nodo = this.validarClase(original)
         if(origen.sentencias.length!=0){
             for (let index = 0; index < origen.sentencias.length; index++) {
@@ -88,26 +91,37 @@ export default class Funcion{
                         lf.push(funcion.valor.substring(7))
                         lr.push("double")
                     }
-                    this.verificarParametros(funcion,lp)
+                    let params:Array<Parametro> = []
+                    lp.push(this.verificarParametros(funcion,params))
                 }else if(funcion.tipo == "METODO" || funcion.tipo == "MAIN"){
                     lf.push(funcion.valor)
                     lr.push("void")
-                    this.verificarParametros(funcion,lp)
+                    let params:Array<Parametro> = []
+                    lp.push(this.verificarParametros(funcion,params))
                 }
             }
         }
         return origen
     }
 
-    verificarParametros(funcion:Nodo, lista:Array<string>){
-        let listaparam:string = ""
+    verificarParametros(funcion:Nodo, lista:Array<Parametro>){
         for (let index = 0; index < funcion.sentencias.length; index++) {
             let parametro:Nodo = funcion.getSentencia(index)
             if(parametro.tipo == "PARAMETRO"){
-                listaparam += parametro.valor + " " + parametro.getSentencia(0).valor + ","
+                let param = new Parametro(parametro.getSentencia(0).valor,parametro.valor)
+                lista.push(param)
             } else break
         }
-        if(listaparam == "") listaparam = " "
-        lista.push(listaparam)
+        return lista
+    }
+}
+
+class Parametro{
+    nombre:string
+    tipo: string
+
+    constructor(n:string,t:string){
+        this.nombre =n
+        this.tipo = t
     }
 }

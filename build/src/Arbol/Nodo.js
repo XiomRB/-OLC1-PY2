@@ -16,4 +16,4 @@ var Nodo = /** @class */ (function () {
     };
     return Nodo;
 }());
-module.exports = Nodo;
+module.exports= Nodo;

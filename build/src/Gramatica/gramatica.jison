@@ -113,7 +113,7 @@ listaid
 
 declavar : tipo listaid asigvar { $$ = new Nodo("DECLARACION",$1); $$.setHijos($2); if($3 != null) $$.sentencias.push($3); };
 
-asigvar : ASIGNADOR expresion PTCOMA {$$ = new Nodo("ASIGNACION","EXPRESION"); $$.sentencias.push($2);}
+asigvar : ASIGNADOR expresion PTCOMA {$$ = new Nodo("ASIGNACION","ASIGNACION"); $$.sentencias.push($2);}
          | PTCOMA {$$ = null;}
 ;
 

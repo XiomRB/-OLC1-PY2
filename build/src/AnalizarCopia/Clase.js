@@ -55,7 +55,14 @@ var ClaseCopia = /** @class */ (function () {
         for (var index = 0; index < original.sentencias.length; index++) {
             var nodo = original.getSentencia(index);
             if (nodo.tipo == "METODO" || nodo.tipo == "FUNCION" || nodo.tipo == "MAIN") {
-                tabla.push(new Objeto(nodo.tipo, nodo.valor));
+                var fm = new Objeto(nodo.tipo, nodo.valor);
+                for (var j = 0; j < nodo.sentencias.length; j++) {
+                    if (nodo.getSentencia(j).tipo == "PARAMETRO")
+                        fm.parametros.push(nodo.getSentencia(j).valor);
+                    else
+                        break;
+                }
+                tabla.push(fm);
             }
         }
     };
@@ -66,6 +73,7 @@ var Objeto = /** @class */ (function () {
     function Objeto(t, n) {
         this.tipo = t;
         this.nombre = n;
+        this.parametros = [];
     }
     return Objeto;
 }());
